@@ -2,7 +2,7 @@ package repository
 
 import (
 	"errors"
-	"order/domain"
+	"order/pkg/order/domain"
 )
 
 type OrderRepository struct {
