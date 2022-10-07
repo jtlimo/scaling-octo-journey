@@ -2,13 +2,14 @@ package main
 
 import (
 	"log"
+	"net/http"
 	"order/pkg/order/routes"
 
-	"github.com/gin-gonic/gin"
+	"github.com/gorilla/mux"
 )
 
 func main() {
-	r := gin.Default()
+	r := mux.NewRouter()
 
 	server := routes.Server{
 		Router: r,
@@ -16,5 +17,5 @@ func main() {
 
 	server.Register()
 
-	log.Fatal(r.Run())
+	log.Fatal(http.ListenAndServe(":3000", r))
 }
