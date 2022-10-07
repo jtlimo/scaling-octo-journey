@@ -1,19 +1,49 @@
 package routes
 
 import (
-	"github.com/gin-gonic/gin"
+	"encoding/json"
+	"net/http"
+	"order/pkg/order/domain"
+	"order/pkg/order/routes/adapters"
+
+	"github.com/gorilla/mux"
 )
 
 type Server struct {
-	Router *gin.Engine
+	Router *mux.Router
 }
 
 func (s *Server) Register() {
-	s.Router.POST("/order", createOrder)
+	s.Router.HandleFunc("/company/{id}/order", createOrder).Methods("POST")
 }
 
-func createOrder(c *gin.Context) {
-	c.JSON(200, gin.H{
-		"message": "pong",
-	})
+func createOrder(w http.ResponseWriter, r *http.Request) {
+	var orderRequest adapters.OrderRequestBody
+	vars := mux.Vars(r)
+	w.Header().Set("Content-Type", "application/json")
+
+	if err := json.NewDecoder(r.Body).Decode(&orderRequest); err != nil {
+		http.Error(w, "Error decoding response object", http.StatusBadRequest)
+		return
+	}
+
+	_, err := json.Marshal(&orderRequest)
+	if err != nil {
+		http.Error(w, "Error encoding response object", http.StatusInternalServerError)
+		return
+	}
+
+	o := adapters.AdaptToDomain(vars["id"], orderRequest)
+	orderDomain, err := domain.New(o.PaymentMethod, o.Address, o.Itens, o.Merchant)
+
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+	}
+
+	orderPayload, err := json.Marshal(adapters.Adapt(orderDomain))
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+	}
+
+	w.Write(orderPayload)
 }
