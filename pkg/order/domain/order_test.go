@@ -11,7 +11,7 @@ func TestCancel(t *testing.T) {
 	t.Run("only changes a order statuses to canceled when is different from preparing or delivered", func(t *testing.T) {
 		itens := []Item{{Quantity: 1, Product: Product{Id: "udfishuifhas"}, Comment: "sem açúcar"}}
 		merchant := Merchant{Id: "uioauiogugi"}
-		expectedStatus := Status{kind: Canceled, reason: "comida fria"}
+		expectedStatus := Status{Kind: Canceled, Reason: "comida fria"}
 
 		order, _ := New("credit", "rua das maravilhas", itens, merchant)
 
