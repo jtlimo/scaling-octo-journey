@@ -9,8 +9,8 @@ import (
 
 func TestCancel(t *testing.T) {
 	t.Run("only changes a order statuses to canceled when is different from preparing or delivered", func(t *testing.T) {
-		itens := []Item{{quantity: 1, product: Product{id: "udfishuifhas", name: "café"}, comment: "sem açúcar"}}
-		merchant := Merchant{id: "uioauiogugi", name: "Test", address: "Rua da tristeza"}
+		itens := []Item{{Quantity: 1, Product: Product{Id: "udfishuifhas"}, Comment: "sem açúcar"}}
+		merchant := Merchant{Id: "uioauiogugi"}
 		expectedStatus := Status{kind: Canceled, reason: "comida fria"}
 
 		order, _ := New("credit", "rua das maravilhas", itens, merchant)
@@ -21,8 +21,8 @@ func TestCancel(t *testing.T) {
 	})
 
 	t.Run("returns an error when try to cancel an order that was delivered ", func(t *testing.T) {
-		itens := []Item{{quantity: 1, product: Product{id: "udfishuifhas", name: "café"}, comment: "sem açúcar"}}
-		merchant := Merchant{id: "uioauiogugi", name: "Test", address: "Rua da tristeza"}
+		itens := []Item{{Quantity: 1, Product: Product{Id: "udfishuifhas"}, Comment: "sem açúcar"}}
+		merchant := Merchant{Id: "uioauiogugi"}
 		expectedError := errors.New("cannot cancel the order")
 
 		order, _ := New("credit", "rua das maravilhas", itens, merchant)

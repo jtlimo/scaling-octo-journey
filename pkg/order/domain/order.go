@@ -25,40 +25,37 @@ type Order struct {
 }
 
 type Status struct {
-	kind   Kind
-	reason string
+	Kind   Kind
+	Reason string
 }
 
 type Item struct {
-	quantity int
-	product  Product
-	comment  string
+	Quantity int
+	Product  Product
+	Comment  string
 }
 
 type Product struct {
-	id   string
-	name string
+	Id string
 }
 
 type Merchant struct {
-	id      string
-	name    string
-	address string
+	Id string
 }
 
 var GenerateNewUUID = uuid.NewString
 
 func (o *Order) cancel(reason string) error {
-	if o.Status.kind != Delivered {
-		o.Status.kind = Canceled
-		o.Status.reason = reason
+	if o.Status.Kind != Delivered {
+		o.Status.Kind = Canceled
+		o.Status.Reason = reason
 		return nil
 	}
 	return errors.New("cannot cancel the order")
 }
 
 func (o *Order) delivered() {
-	o.Status.kind = Delivered
+	o.Status.Kind = Delivered
 }
 
 // TODO: create a method to prepare a order - put an order to preparing status
@@ -71,7 +68,7 @@ func New(paymentMethod string, address string, itens []Item, merchant Merchant) 
 	order := &Order{
 		Id:            duuid,
 		PaymentMethod: paymentMethod,
-		Status:        Status{kind: Pending, reason: ""},
+		Status:        Status{Kind: Pending, Reason: ""},
 		Address:       address,
 		Itens:         itens,
 		Merchant:      merchant,
