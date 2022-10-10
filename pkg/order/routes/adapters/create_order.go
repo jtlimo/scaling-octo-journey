@@ -2,7 +2,6 @@ package adapters
 
 type OrderRequestBody struct {
 	Itens         []Item `json:"itens"`
-	MerchantId    string `json:"merchantId"`
 	PaymentMethod string `json:"paymentMethod"`
 	Address       string `json:"address"`
 }
