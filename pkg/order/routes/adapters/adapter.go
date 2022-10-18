@@ -1,65 +1,49 @@
 package adapters
 
 import (
+	"encoding/json"
 	"order/pkg/order/domain"
 )
 
 func Adapt(o *domain.Order) OrderResponse {
+	itens := toItens[domain.Item, Item](o.Itens)
 	return OrderResponse{
 		Id:            o.Id,
 		PaymentMethod: o.PaymentMethod,
 		Status:        Kind(o.Status.Kind),
 		Address:       o.Address,
-		Itens:         toItens2(o.Itens),
+		Itens:         itens,
 		Merchant:      Merchant(o.Merchant),
 	}
 }
 
 func AdaptToDomain(companyID string, orderRequestBody OrderRequestBody) *domain.Order {
+	itens := toItens[Item, domain.Item](orderRequestBody.Itens)
 	return &domain.Order{
 		PaymentMethod: orderRequestBody.PaymentMethod,
 		Merchant: domain.Merchant{
 			Id: companyID,
 		},
-		Itens:   toItens(orderRequestBody.Itens),
+		Itens:   itens,
 		Address: orderRequestBody.Address,
 	}
 }
 
-// FIXME: Learn how to implement this function using generics
-func toItens2(itens []domain.Item) []Item {
-	it := make([]Item, 0)
-	for _, i := range itens {
-		it = append(it, Item{
-			Quantity: i.Quantity,
-			Product:  ToProduct2(i.Product),
-			Comment:  i.Comment,
-		})
+type Itens interface {
+	Item | domain.Item
+}
+
+type Products interface {
+	Product | domain.Product
+}
+
+func toItens[IN Itens, OUT Itens](items []IN) []OUT {
+	it := make([]OUT, 0)
+	for _, i := range items {
+		var m OUT
+		mm, _ := json.Marshal(i)
+		json.Unmarshal(mm, &m)
+		it = append(it, m)
 	}
 	return it
-}
-
-func toItens(itens []Item) []domain.Item {
-	it := make([]domain.Item, 0)
-	for _, i := range itens {
-		it = append(it, domain.Item{
-			Quantity: i.Quantity,
-			Product:  ToProduct(i.Product),
-			Comment:  i.Comment,
-		})
-	}
-	return it
-}
-
-// FIXME: Learn how to implement this function using generics
-func ToProduct2(product domain.Product) Product {
-	return Product{
-		Id: product.Id,
-	}
-}
-
-func ToProduct(product Product) domain.Product {
-	return domain.Product{
-		Id: product.Id,
-	}
 }
