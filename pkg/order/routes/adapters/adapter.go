@@ -33,10 +33,6 @@ type Itens interface {
 	Item | domain.Item
 }
 
-type Products interface {
-	Product | domain.Product
-}
-
 func toItens[IN Itens, OUT Itens](items []IN) []OUT {
 	it := make([]OUT, 0)
 	for _, i := range items {
