@@ -7,7 +7,9 @@ import (
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
+	"order/pkg/order/application"
 	"order/pkg/order/domain"
+	"order/pkg/order/repository"
 	"order/pkg/order/routes/adapters"
 	"testing"
 
@@ -16,7 +18,8 @@ import (
 )
 
 var s = Server{
-	Router: mux.NewRouter(),
+	Router:      mux.NewRouter(),
+	Application: application.New((repository.New())),
 }
 
 func TestCreateOrder(t *testing.T) {

@@ -3,21 +3,22 @@ package routes
 import (
 	"encoding/json"
 	"net/http"
-	"order/pkg/order/domain"
+	"order/pkg/order/application"
 	"order/pkg/order/routes/adapters"
 
 	"github.com/gorilla/mux"
 )
 
 type Server struct {
-	Router *mux.Router
+	Router      *mux.Router
+	Application *application.Application
 }
 
 func (s *Server) Register() {
-	s.Router.HandleFunc("/company/{id}/order", createOrder).Methods("POST")
+	s.Router.HandleFunc("/company/{id}/order", s.createOrder).Methods("POST")
 }
 
-func createOrder(w http.ResponseWriter, r *http.Request) {
+func (s *Server) createOrder(w http.ResponseWriter, r *http.Request) {
 	var orderRequest adapters.OrderRequestBody
 	vars := mux.Vars(r)
 	w.Header().Set("Content-Type", "application/json")
@@ -33,8 +34,7 @@ func createOrder(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	o := adapters.AdaptToDomain(vars["id"], orderRequest)
-	orderDomain, err := domain.New(o.PaymentMethod, o.Address, o.Itens, o.Merchant)
+	orderDomain, err := adapters.AdaptToDomain(vars["id"], orderRequest)
 
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
@@ -43,6 +43,11 @@ func createOrder(w http.ResponseWriter, r *http.Request) {
 	orderPayload, err := json.Marshal(adapters.Adapt(orderDomain))
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
+	}
+
+	err = s.Application.CreateOrder(orderDomain)
+	if err != nil {
+		return
 	}
 
 	w.Write(orderPayload)

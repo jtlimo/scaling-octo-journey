@@ -6,10 +6,16 @@ import (
 )
 
 type OrderRepository struct {
-	orders []domain.Order
+	orders []*domain.Order
 }
 
-func (or *OrderRepository) insert(order domain.Order) error {
+func New() (repo *OrderRepository) {
+	return &OrderRepository{
+		orders: make([]*domain.Order, 0),
+	}
+}
+
+func (or *OrderRepository) Insert(order *domain.Order) error {
 	or.orders = append(or.orders, order)
 	return nil
 }
@@ -17,7 +23,7 @@ func (or *OrderRepository) insert(order domain.Order) error {
 func (or *OrderRepository) getByID(id string) (*domain.Order, error) {
 	for _, order := range or.orders {
 		if order.Id == id {
-			return &order, nil
+			return order, nil
 		}
 	}
 	return nil, errors.New("order not found")

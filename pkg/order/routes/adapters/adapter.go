@@ -17,16 +17,10 @@ func Adapt(o *domain.Order) OrderResponse {
 	}
 }
 
-func AdaptToDomain(companyID string, orderRequestBody OrderRequestBody) *domain.Order {
+func AdaptToDomain(companyID string, orderRequestBody OrderRequestBody) (*domain.Order, error) {
 	itens := toItens[Item, domain.Item](orderRequestBody.Itens)
-	return &domain.Order{
-		PaymentMethod: orderRequestBody.PaymentMethod,
-		Merchant: domain.Merchant{
-			Id: companyID,
-		},
-		Itens:   itens,
-		Address: orderRequestBody.Address,
-	}
+	merchant := domain.Merchant{Id: companyID}
+	return domain.New(orderRequestBody.PaymentMethod, orderRequestBody.Address, itens, merchant)
 }
 
 type Itens interface {

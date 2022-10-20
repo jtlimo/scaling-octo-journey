@@ -3,6 +3,8 @@ package main
 import (
 	"log"
 	"net/http"
+	"order/pkg/order/application"
+	"order/pkg/order/repository"
 	"order/pkg/order/routes"
 
 	"github.com/gorilla/mux"
@@ -11,8 +13,11 @@ import (
 func main() {
 	r := mux.NewRouter()
 
+	repository := repository.New()
+	application := application.New(repository)
 	server := routes.Server{
-		Router: r,
+		Router:      r,
+		Application: application,
 	}
 
 	server.Register()
